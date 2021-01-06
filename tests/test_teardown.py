@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, call
 
-from common import execute_multiple_statements
+from common import execute_multiple_statements, execute_statement
 
 copy_queries = [
     # Claimant
@@ -70,6 +70,15 @@ class TestDatabase(unittest.TestCase):
         execute_multiple_statements(drop_query, connection_mock)
 
         cursor_mock.execute.assert_called_once_with(drop_query, multi=True)
+
+    def test_rename_query(self):
+        cursor_mock = MagicMock()
+        connection_mock = MagicMock()
+        connection_mock.cursor.return_value = cursor_mock
+
+        execute_statement(rename_query, connection_mock)
+
+        cursor_mock.execute.assert_called_once_with(rename_query)
 
 
 if __name__ == '__main__':
