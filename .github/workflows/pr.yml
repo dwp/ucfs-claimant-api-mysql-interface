@@ -21,7 +21,7 @@ jobs:
         run: pip install black
 
       - name: Install Tox
-          run: pip install tox
+        run: pip install tox
 
       - name: Run black --check .
         id: check-formatting
