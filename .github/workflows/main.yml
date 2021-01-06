@@ -31,9 +31,7 @@ jobs:
         working-directory: ./artifacts
         run: |
           mkdir common
-          mkdir provisioner_lambda
-          mkdir query_lambda
-          mkdir unreconciled_lambda
+          mkdir teardown_lambda
           mkdir resources
       - name: Set up Python 3.8
         uses: actions/setup-python@v1
