@@ -7,3 +7,5 @@ This repo is a base to create new non-Terraform repos, adding the githooks submo
 
 After cloning this repo, please run:  
 `make bootstrap`
+
+
