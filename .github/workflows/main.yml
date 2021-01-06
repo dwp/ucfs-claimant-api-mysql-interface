@@ -1,9 +1,9 @@
 name: Master
 
 on:
-  pull_request:
-    paths-ignore:
-      - '.github/workflows/**'
+  push:
+    branches:
+      - master
 
 jobs:
   get-publish-version:
