@@ -1,63 +1,64 @@
 import json
 import os
 
-from common import initialise_logger, get_parameters, get_connection, execute_statement, execute_multiple_statements
+from common import common, database
 
 logger = None
+
+# Copy tables
+copy_queries = [
+    # Claimant
+    """
+    CREATE TABLE IF NOT EXISTS claimant_stage LIKE claimant_old;
+    INSERT INTO claimant_stage (id, data) SELECT id, data from claimant_old;
+    """,
+    # Contract
+    """
+    CREATE TABLE IF NOT EXISTS contract_stage LIKE contract_old;
+    INSERT contract_stage (id, data) SELECT id, data from contract_old;
+    """,
+    # Statement
+    """
+    CREATE TABLE IF NOT EXISTS statement_stage LIKE statement_old;
+    INSERT statement_stage (id, data) SELECT id, data from statement_old;
+    """,
+]
+
+# Drop in-use tables
+drop_query = """
+DROP TABLE IF EXISTS claimant;
+DROP TABLE IF EXISTS contract;
+DROP TABLE IF EXISTS statement;
+"""
+
+# Remove _stage suffixes
+rename_query = """
+RENAME TABLE claimant_stage TO claimant,
+             contract_stage TO contract,
+             statement_stage TO statement;
+"""
 
 
 def handler(event, context):
     global logger
 
-    args = get_parameters(event, [])  # Empty list means no keys are required
+    try:
+        # Empty list means no keys are required
+        args = common.get_parameters(event, [])
 
-    logger = initialise_logger(args)
+        logger = common.initialise_logger(args)
+        connection = database.get_connection(args)
 
-    # Copy tables
-    # TODO: Potential issue with NULL data being copied from empty table
-    copy_queries = [
-        # Claimant
-        """
-        CREATE TABLE IF NOT EXISTS claimant_stage LIKE claimant_old;
-        INSERT INTO claimant_stage (id, data) SELECT id, data from claimant_old;
-        """,
+        for query in copy_queries:
+            database.execute_multiple_statements(query, connection)
 
-        # Contract
-        """
-        CREATE TABLE IF NOT EXISTS contract_stage LIKE contract_old;
-        INSERT contract_stage (id, data) SELECT id, data from contract_old;
-        """,
+        database.execute_multiple_statements(drop_query, connection)
+        database.execute_statement(rename_query, connection)
 
-        # Statement
-        """
-        CREATE TABLE IF NOT EXISTS statement_stage LIKE statement_old;
-        INSERT statement_stage (id, data) SELECT id, data from statement_old;
-        """
-    ]
-
-    # Drop in-use tables
-    drop_query = """
-    DROP TABLE IF EXISTS claimant;
-    DROP TABLE IF EXISTS contract;
-    DROP TABLE IF EXISTS statement;
-    """
-
-    # Remove _stage suffixes
-    rename_query = """
-    RENAME TABLE claimant_stage TO claimant,
-                 contract_stage TO contract,
-                 statement_stage TO statement;
-    """
-
-    connection = get_connection(args)
-
-    for query in copy_queries:
-        execute_multiple_statements(query, connection)
-
-    execute_multiple_statements(drop_query, connection)
-    execute_statement(rename_query, connection)
-
-    return "OK"  # TODO: Change this response in future
+        return 200
+    except Exception as e:
+        logger.error(e)
+        return 500
 
 
 if __name__ == "__main__":

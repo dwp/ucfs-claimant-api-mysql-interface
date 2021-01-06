@@ -1,9 +1,11 @@
-import logging
-import socket
-import boto3
-import os
-import sys
 import json
+import logging
+import os
+import socket
+import sys
+
+import boto3
+
 from common import database
 
 
@@ -13,7 +15,6 @@ def initialise_logger(args):
             os.environ["LOG_LEVEL"] if "LOG_LEVEL" in os.environ else "INFO",
             args["environment"] if "environment" in args else os.environ["ENVIRONMENT"],
             args["application"] if "application" in args else os.environ["APPLICATION"],
-            args["table-name"],
         )
     except KeyError as e:
         print(
@@ -22,7 +23,7 @@ def initialise_logger(args):
         raise e
 
 
-def setup_logging(logger_level, environment, application, table_name):
+def setup_logging(logger_level, environment, application):
     """Set the default logger with json output."""
     the_logger = logging.getLogger()
     for old_handler in the_logger.handlers:
@@ -36,7 +37,7 @@ def setup_logging(logger_level, environment, application, table_name):
         '{ "timestamp": "%(asctime)s", "log_level": "%(levelname)s", "message": "%(message)s", '
         f'"environment": "{environment}","application": "{application}", '
         f'"module": "%(module)s", "process":"%(process)s", '
-        f'"thread": "[%(thread)s]", "hostname": "{hostname}", "table_name": "{table_name}" }}'
+        f'"thread": "[%(thread)s]", "hostname": "{hostname}"}}'
     )
 
     new_handler.setFormatter(logging.Formatter(json_format))
@@ -123,7 +124,3 @@ def get_parameters(event, required_keys):
 
     logger.info(f"Args: {json.dumps(_args)}")
     return _args
-
-
-def get_table_name(args):
-    return database.Table[args["table-name"].upper()].value
