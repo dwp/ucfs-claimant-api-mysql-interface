@@ -14,23 +14,24 @@ def handler(event, context):
     logger = initialise_logger(args)
 
     # Copy tables
+    # TODO: Potential issue with NULL data being copied from empty table
     copy_queries = [
         # Claimant
         """
         CREATE TABLE IF NOT EXISTS claimant_stage LIKE claimant_old;
-        INSERT claimant_stage SELECT * from claimant_old;
+        INSERT INTO claimant_stage (id, data) SELECT id, data from claimant_old;
         """,
 
         # Contract
         """
         CREATE TABLE IF NOT EXISTS contract_stage LIKE contract_old;
-        INSERT contract_stage SELECT * from contract_old;
+        INSERT contract_stage (id, data) SELECT id, data from contract_old;
         """,
 
         # Statement
         """
         CREATE TABLE IF NOT EXISTS statement_stage LIKE statement_old;
-        INSERT statement_stage SELECT * from statement_old;
+        INSERT statement_stage (id, data) SELECT id, data from statement_old;
         """
     ]
 

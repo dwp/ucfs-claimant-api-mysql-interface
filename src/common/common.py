@@ -107,7 +107,7 @@ def get_parameters(event, required_keys):
             missing_event_keys.append(required_arg)
     if missing_event_keys:
         raise KeyError(
-            "KeyError: The following required keys are missing from the event or env vars: {}".format(
+            "KeyError: The following keys are missing from the event or env vars: {}".format(
                 ", ".join(missing_event_keys)
             )
         )

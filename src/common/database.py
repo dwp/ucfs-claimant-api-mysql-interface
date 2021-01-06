@@ -18,14 +18,11 @@ class Table(Enum):
 
 
 def get_mysql_password():
-    secrets_manager = boto3.client("secretsmanager")
-    get_secret_value_response = secrets_manager.get_secret_value(
+    secrets_manager = boto3.client("secretsmanager", endpoint_url="http://localhost:4566",
+                                   region_name="eu-west-2")
+    return secrets_manager.get_secret_value(
         SecretId=os.environ["RDS_PASSWORD_SECRET_NAME"]
     )["SecretString"]
-    secret_dict = ast.literal_eval(
-        get_secret_value_response
-    )  # converts str representation of dict to actual dict
-    return secret_dict["password"]
 
 
 def get_connection(args):
