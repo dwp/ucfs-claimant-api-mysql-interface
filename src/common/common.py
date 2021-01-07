@@ -6,8 +6,6 @@ import sys
 
 import boto3
 
-from common import database
-
 
 def initialise_logger(args):
     try:
@@ -84,14 +82,6 @@ def get_parameters(event, required_keys):
     if "RDS_PASSWORD_SECRET_NAME" in os.environ:
         _args["rds_password_secret_name"] = os.environ["RDS_PASSWORD_SECRET_NAME"]
 
-    if "RECONCILER_MAXIMUM_AGE_SCALE" in os.environ:
-        _args["reconciler_maximum_age_scale"] = os.environ[
-            "RECONCILER_MAXIMUM_AGE_SCALE"
-        ]
-
-    if "RECONCILER_MAXIMUM_AGE_UNIT" in os.environ:
-        _args["reconciler_maximum_age_unit"] = os.environ["RECONCILER_MAXIMUM_AGE_UNIT"]
-
     required_env_vars = [
         "environment",
         "application",
@@ -111,15 +101,6 @@ def get_parameters(event, required_keys):
             "KeyError: The following keys are missing from the event or env vars: {}".format(
                 ", ".join(missing_event_keys)
             )
-        )
-
-    # Validate table name
-    if (
-        "table-name" in _args
-        and _args["table-name"].upper() not in database.Table.__members__
-    ):
-        raise ValueError(
-            f"ValueError: table-name {_args['table-name'].upper()} is invalid or not supported"
         )
 
     logger.info(f"Args: {json.dumps(_args)}")
