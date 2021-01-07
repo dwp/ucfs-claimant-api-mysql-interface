@@ -1,0 +1,3 @@
+boto3==1.16.49
+mysql-connector-python==8.0.22
+tox==3.20.1
