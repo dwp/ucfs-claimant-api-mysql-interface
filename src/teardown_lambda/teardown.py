@@ -5,23 +5,19 @@ from common import common, database
 
 logger = None
 
+base_copy_query = """
+CREATE TABLE IF NOT EXISTS {table}_stage LIKE {table}_old;
+INSERT INTO {table}_stage (id, data) SELECT id, data from {table}_old;
+"""
+
 # Copy tables
 copy_queries = [
     # Claimant
-    """
-    CREATE TABLE IF NOT EXISTS claimant_stage LIKE claimant_old;
-    INSERT INTO claimant_stage (id, data) SELECT id, data from claimant_old;
-    """,
+    base_copy_query.replace("{table}", "claimant"),
     # Contract
-    """
-    CREATE TABLE IF NOT EXISTS contract_stage LIKE contract_old;
-    INSERT contract_stage (id, data) SELECT id, data from contract_old;
-    """,
+    base_copy_query.replace("{table}", "contract"),
     # Statement
-    """
-    CREATE TABLE IF NOT EXISTS statement_stage LIKE statement_old;
-    INSERT statement_stage (id, data) SELECT id, data from statement_old;
-    """,
+    base_copy_query.replace("{table}", "statement"),
 ]
 
 # Drop in-use tables
@@ -57,6 +53,7 @@ def handler(event, context):
 
         return 200
     except Exception as e:
+        logger.error("Failed to execute one or more SQL statement(s)")
         logger.error(e)
         return 500
 
