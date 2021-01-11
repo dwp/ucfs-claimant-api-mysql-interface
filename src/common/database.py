@@ -43,6 +43,7 @@ def get_connection(args):
         else os.environ["RDS_DATABASE_NAME"],
         ssl_ca=abs_file_path,
         ssl_verify_cert=False if skip_ssl else True,
+
     )
 
 
