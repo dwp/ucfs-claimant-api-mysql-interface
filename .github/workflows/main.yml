@@ -37,7 +37,6 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      # TODO: Find out about the rds-ca-2019-root.pem file and sort below section accordingly
       - name: Install dependencies
         run: |
           pip install -r requirements.txt -t artifacts
