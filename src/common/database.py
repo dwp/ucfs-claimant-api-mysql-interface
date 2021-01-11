@@ -19,7 +19,7 @@ def get_connection(args):
     global logger
 
     script_dir = os.path.dirname(__file__)
-    rel_path = "AmazonRootCA1.pem"
+    rel_path = "rds-ca-2019-root.pem"
     abs_file_path = os.path.join(script_dir, rel_path)
 
     logger.info(f"Path to the CR cert is '{abs_file_path}'")
