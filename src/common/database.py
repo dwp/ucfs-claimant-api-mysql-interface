@@ -38,7 +38,7 @@ def get_connection(args):
         else os.environ["RDS_USERNAME"],
         password=args["rds_password"]
         if "rds_password" in args
-        else get_mysql_password(),
+        else get_mysql_password(args),
         database=args["rds_database_name"]
         if "rds_database_name" in args
         else os.environ["RDS_DATABASE_NAME"],
