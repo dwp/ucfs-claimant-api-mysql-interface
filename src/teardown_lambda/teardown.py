@@ -48,7 +48,10 @@ def handler(event, context):
         connection = database.get_connection(args)
 
         with ThreadPool(3) as pool:
-            pool.starmap(database.execute_multiple_statements, [(query, connection) for query in copy_queries])
+            pool.starmap(
+                database.execute_multiple_statements,
+                [(query, connection) for query in copy_queries],
+            )
 
         database.execute_multiple_statements(drop_query, connection)
         database.execute_statement(rename_query, connection)
