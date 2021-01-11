@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 def get_mysql_password(args):
     secrets_manager = boto3.client("secretsmanager")
     secret_string = secrets_manager.get_secret_value(
-        SecretId=args["rds_password_secret_name"] if "rds_password_secret_name" in args
+        SecretId=args["rds_password_secret_name"]
+        if "rds_password_secret_name" in args
         else os.environ["RDS_PASSWORD_SECRET_NAME"]
     )["SecretString"]
     loaded_secret_string = json.loads(secret_string)
@@ -37,7 +38,7 @@ def get_connection(args):
         else os.environ["RDS_USERNAME"],
         password=args["rds_password"]
         if "rds_password" in args
-        else get_mysql_password(args),
+        else get_mysql_password(),
         database=args["rds_database_name"]
         if "rds_database_name" in args
         else os.environ["RDS_DATABASE_NAME"],
