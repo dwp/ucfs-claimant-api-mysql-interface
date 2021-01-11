@@ -37,15 +37,14 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.8
-      # TODO: Find out about the AmazonRootCA1.pem file and sort below section accordingly
       - name: Install dependencies
         run: |
           pip install -r requirements.txt -t artifacts
           cp src/common/*.py artifacts/common
           cp src/teardown_lambda/*.py artifacts/teardown_lambda
           cp src/resources/*.json artifacts/resources
-          cp AmazonRootCA1.pem artifacts/common
-          # AmazonRootCA1.pem file is used by the database class, which is in common so is copied to here
+          cp rds-ca-2019-root.pem artifacts/common
+          # rds-ca-2019-root.pem file is used by the database class, which is in common so is copied to here
           # But in the project it should be visible and easily available so left in root folder, which as it's not needed locally causes no issues
       - name: Produce zip
         working-directory: ./artifacts
