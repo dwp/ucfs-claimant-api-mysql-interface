@@ -10,9 +10,11 @@ logger = logging.getLogger(__name__)
 
 def get_mysql_password():
     secrets_manager = boto3.client("secretsmanager")
-    return secrets_manager.get_secret_value(
+    secret_string = secrets_manager.get_secret_value(
         SecretId=os.environ["RDS_PASSWORD_SECRET_NAME"]
     )["SecretString"]
+    loaded_secret_string = json.load(secret_string)
+    return loaded_secret_string["password"]
 
 
 def get_connection(args):
