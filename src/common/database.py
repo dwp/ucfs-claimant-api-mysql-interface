@@ -24,10 +24,6 @@ def get_connection(args):
 
     logger.info(f"Path to the CR cert is '{abs_file_path}'")
 
-    skip_ssl = args["skip_ssl"] if "skip_ssl" in args else ("SKIP_SSL" not in os.environ)
-
-    logger.info(f"skip_ssl variable: {skip_ssl}")
-
     return mysql.connector.connect(
         host=args["rds_endpoint"]
         if "rds_endpoint" in args
@@ -42,7 +38,9 @@ def get_connection(args):
         if "rds_database_name" in args
         else os.environ["RDS_DATABASE_NAME"],
         ssl_ca=abs_file_path,
-        ssl_verify_cert=False if skip_ssl else True,
+        ssl_verify_cert=not args["skip_ssl"]
+        if "skip_ssl" in args
+        else ("SKIP_SSL" not in os.environ),
 
     )
 
