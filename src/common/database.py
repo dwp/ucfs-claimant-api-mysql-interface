@@ -41,7 +41,6 @@ def get_connection(args):
         ssl_verify_cert=not args["skip_ssl"]
         if "skip_ssl" in args
         else ("SKIP_SSL" not in os.environ),
-
     )
 
 
