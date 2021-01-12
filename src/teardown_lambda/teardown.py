@@ -58,12 +58,14 @@ def handler(event, context):
         with pooled_executor(3) as executor:
             logger.info("Started executor")
 
-            futures = [executor.submit(execute_query_multiple_statements, query, args)
-                       for query in copy_queries]
+            futures = [
+                executor.submit(execute_query_multiple_statements, query, args)
+                for query in copy_queries
+            ]
 
             for future in futures:
                 logger.info(f"Future: {future}")
-            
+
             wait(futures)
             executor.shutdown()
 
