@@ -7,6 +7,7 @@ from common import common, database
 logger = None
 
 base_copy_query = """
+DROP TABLE IF EXISTS {table}_stage;
 CREATE TABLE IF NOT EXISTS {table}_stage LIKE {table}_old;
 INSERT INTO {table}_stage (id, data) SELECT id, data from {table}_old;
 """
