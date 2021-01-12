@@ -72,6 +72,6 @@ def execute_multiple_statements(sql, connection):
                     )
                 )
         connection.commit()
-    except Exception ex:
+    except Exception as ex:
         logger.error(ex)
         raise ex
