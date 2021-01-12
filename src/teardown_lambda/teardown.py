@@ -1,7 +1,7 @@
 import json
 import os
-
-from multiprocessing.dummy import Pool as ThreadPool
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait
+from typing import Optional
 
 from common import common, database
 
@@ -37,6 +37,15 @@ RENAME TABLE claimant_stage TO claimant,
 """
 
 
+def execute_query_multiple_statements(query, args):
+    query_connection = database.get_connection(args)
+    database.execute_multiple_statements(query, query_connection)
+
+
+def pooled_executor(threads: Optional[int] = 2):
+    return ProcessPoolExecutor(max_workers=threads)
+
+
 def handler(event, context):
     global logger
 
@@ -46,17 +55,23 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
-        threaded_params = [
-            (query, database.get_connection(args)) for query in copy_queries
-        ]
+        with pooled_executor(3) as executor:
+            logger.info("Started executor")
 
-        logger.info(f"threaded_params: {threaded_params}")
+            futures = [
+                executor.submit(execute_query_multiple_statements, query, args)
+                for query in copy_queries
+            ]
 
-        with ThreadPool(3) as pool:
-            pool.starmap(database.execute_multiple_statements, threaded_params)
+            for future in futures:
+                logger.info(f"Future: {future}")
+
+            wait(futures)
+            executor.shutdown()
+
+            logger.info("Executor shutdown")
 
         connection = database.get_connection(args)
-
         database.execute_multiple_statements(drop_query, connection)
         database.execute_statement(rename_query, connection)
 

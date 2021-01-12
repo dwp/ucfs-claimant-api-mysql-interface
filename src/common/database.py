@@ -59,15 +59,19 @@ def execute_statement(sql, connection):
 def execute_multiple_statements(sql, connection):
     global logger
 
-    cursor = connection.cursor()
-    results = cursor.execute(sql, multi=True)
-    for result in results:
-        if result.with_rows:
-            logger.info("Executed: {}".format(result.statement))
-        else:
-            logger.info(
-                "Executed: {}, Rows affected: {}".format(
-                    result.statement, result.rowcount
+    try:
+        cursor = connection.cursor()
+        results = cursor.execute(sql, multi=True)
+        for result in results:
+            if result.with_rows:
+                logger.info("Executed: {}".format(result.statement))
+            else:
+                logger.info(
+                    "Executed: {}, Rows affected: {}".format(
+                        result.statement, result.rowcount
+                    )
                 )
-            )
-    connection.commit()
+        connection.commit()
+    except Exception as ex:
+        logger.error(ex.format_exc())
+        raise ex
