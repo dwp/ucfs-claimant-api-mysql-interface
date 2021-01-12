@@ -1,6 +1,8 @@
 import json
 import os
 
+from multiprocessing.dummy import Pool as ThreadPool
+
 from common import common, database
 
 logger = None
@@ -43,10 +45,17 @@ def handler(event, context):
         args = common.get_parameters(event, [])
 
         logger = common.initialise_logger(args)
-        connection = database.get_connection(args)
 
-        for query in copy_queries:
-            database.execute_multiple_statements(query, connection)
+        threaded_params = [
+            (query, database.get_connection(args)) for query in copy_queries
+        ]
+
+        logger.info(f"threaded_params: {threaded_params}")
+
+        with ThreadPool(3) as pool:
+            pool.starmap(database.execute_multiple_statements, threaded_params)
+
+        connection = database.get_connection(args)
 
         database.execute_multiple_statements(drop_query, connection)
         database.execute_statement(rename_query, connection)

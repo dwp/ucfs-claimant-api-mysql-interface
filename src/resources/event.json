@@ -5,5 +5,6 @@
   "rds_username": "root",
   "rds_database_name": "metadatastore",
   "rds_password_secret_name": "RDS_PASSWORD_SECRET_NAME",
+  "rds_password": "password",
   "skip_ssl": true
 }
