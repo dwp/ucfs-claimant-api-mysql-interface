@@ -46,15 +46,14 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
-        threaded_params = [(query, database.get_connection(args)) for query in copy_queries]
+        threaded_params = [
+            (query, database.get_connection(args)) for query in copy_queries
+        ]
 
         logger.info(f"threaded_params: {threaded_params}")
 
         with ThreadPool(3) as pool:
-            pool.starmap(
-                database.execute_multiple_statements,
-                threaded_params
-            )
+            pool.starmap(database.execute_multiple_statements, threaded_params)
 
         connection = database.get_connection(args)
 
