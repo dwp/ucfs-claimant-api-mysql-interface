@@ -37,8 +37,8 @@ RENAME TABLE claimant_stage TO claimant,
 """
 
 
-def pooled_executor(multiprocessor: bool, threads: Optional[int] = 2):
-    return ProcessPoolExecutor(max_workers=threads) if multiprocessor else ThreadPoolExecutor(max_workers=threads)
+def pooled_executor(threads: Optional[int] = 2):
+    return ProcessPoolExecutor(max_workers=threads)
 
 
 def handler(event, context):
@@ -50,21 +50,21 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
-        with pooled_executor(True, 3) as executor:
+        connection = database.get_connection(args)
+
+        with pooled_executor(3) as executor:
             logger.info("Started executor")
-            futures = [executor.submit(database.execute_statement, query, database.get_connection(args))
+
+            futures = [executor.submit(database.execute_statement, query, connection)
                        for query in copy_queries]
 
-            logger.info("Waiting for futures")
-            wait(futures)
-
-            executor.shutdown()
-            logger.info("Executor shutdown")
-
             for future in futures:
-                logger.info(f"Future: {future.exception()}")
+                logger.info(f"Future: {future}")
+            
+            wait(futures)
+            executor.shutdown()
 
-        connection = database.get_connection(args)
+            logger.info("Executor shutdown")
 
         database.execute_multiple_statements(drop_query, connection)
         database.execute_statement(rename_query, connection)
