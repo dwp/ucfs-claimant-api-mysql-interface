@@ -50,6 +50,8 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
+        processes = []
+
         for query in copy_queries:
             p = multiprocessing.Process(target=execute_query_multiple_statements, args=(query, args,))
             processes.append(p)
