@@ -1,7 +1,6 @@
 import json
 import os
 import multiprocessing
-from typing import Optional
 
 from common import common, database
 
@@ -40,10 +39,6 @@ RENAME TABLE claimant_stage TO claimant,
 def execute_query_multiple_statements(query, args):
     query_connection = database.get_connection(args)
     database.execute_multiple_statements(query, query_connection)
-
-
-def pooled_executor(threads: Optional[int] = 2):
-    return ProcessPoolExecutor(max_workers=threads)
 
 
 def handler(event, context):
