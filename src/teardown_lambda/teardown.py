@@ -53,7 +53,13 @@ def handler(event, context):
         processes = []
 
         for query in copy_queries:
-            p = multiprocessing.Process(target=execute_query_multiple_statements, args=(query, args,))
+            p = multiprocessing.Process(
+                target=execute_query_multiple_statements,
+                args=(
+                    query,
+                    args,
+                ),
+            )
             processes.append(p)
             p.start()
 
