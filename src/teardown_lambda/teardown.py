@@ -37,8 +37,9 @@ RENAME TABLE claimant_stage TO claimant,
 """
 
 
-def execute_query_multiple_statements(query, connection):
-    database.execute_multiple_statements(query, connection)
+def execute_query_multiple_statements(query, args):
+    query_connection = database.get_connection(args)
+    database.execute_multiple_statements(query, query_connection)
 
 
 def pooled_executor(threads: Optional[int] = 2):
@@ -54,12 +55,10 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
-        connection = database.get_connection(args)
-
         with pooled_executor(3) as executor:
             logger.info("Started executor")
 
-            futures = [executor.submit(execute_query_multiple_statements, query, connection)
+            futures = [executor.submit(execute_query_multiple_statements, query, args)
                        for query in copy_queries]
 
             for future in futures:
@@ -70,6 +69,7 @@ def handler(event, context):
 
             logger.info("Executor shutdown")
 
+        connection = database.get_connection(args)
         database.execute_multiple_statements(drop_query, connection)
         database.execute_statement(rename_query, connection)
 
