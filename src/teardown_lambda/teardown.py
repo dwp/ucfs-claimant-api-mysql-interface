@@ -1,7 +1,6 @@
 import json
 import os
-from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, wait
-from typing import Optional
+import multiprocessing
 
 from common import common, database
 
@@ -42,10 +41,6 @@ def execute_query_multiple_statements(query, args):
     database.execute_multiple_statements(query, query_connection)
 
 
-def pooled_executor(threads: Optional[int] = 2):
-    return ProcessPoolExecutor(max_workers=threads)
-
-
 def handler(event, context):
     global logger
 
@@ -55,21 +50,21 @@ def handler(event, context):
 
         logger = common.initialise_logger(args)
 
-        with pooled_executor(3) as executor:
-            logger.info("Started executor")
+        processes = []
 
-            futures = [
-                executor.submit(execute_query_multiple_statements, query, args)
-                for query in copy_queries
-            ]
+        for query in copy_queries:
+            p = multiprocessing.Process(
+                target=execute_query_multiple_statements,
+                args=(
+                    query,
+                    args,
+                ),
+            )
+            processes.append(p)
+            p.start()
 
-            for future in futures:
-                logger.info(f"Future: {future}")
-
-            wait(futures)
-            executor.shutdown()
-
-            logger.info("Executor shutdown")
+        for process in processes:
+            process.join()
 
         connection = database.get_connection(args)
         database.execute_multiple_statements(drop_query, connection)
