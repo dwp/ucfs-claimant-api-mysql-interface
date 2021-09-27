@@ -2,12 +2,34 @@
 
 ## AWS lambda to provide an interface with the UCFS Claimant API database.
 
-This repo contains Makefile to fit the standard pattern.
-This repo is a base to create new non-Terraform repos, adding the githooks submodule, making the repo ready for use.
-
 After cloning this repo, please run:  
 `make bootstrap`
 
+This lambda is used to load data from a stage environment in to the production environment for the Claimant API mysql database. It is no longer used due to Claimant API being completely switched over in live to a streaming platform now.
+
+## Process
+
+The lambda performs the following to load data from stage, replacing the existing data:
+
+1. Drop a temp table if exists
+2. Create the temp table again from the staging table
+3. Rename the main table to `_old`
+4. Rename the temp table to the main table
+
+## Triggering
+
+To trigger the lambda, you need to provide it a payload like this:
+
+{
+  "environment": "dev",
+  "application": "dev",
+  "rds_endpoint": "localhost",
+  "rds_username": "root",
+  "rds_database_name": "db_name",
+  "rds_password_secret_name": "secret_name",
+  "rds_password": "password",
+  "skip_ssl": true
+}
 
 ## Testing
 
