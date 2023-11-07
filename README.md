@@ -1,3 +1,5 @@
+# DO NOT USE THIS REPO - MIGRATED TO GITLAB
+
 # ucfs-claimant-api-mysql-interface
 
 ## AWS lambda to provide an interface with the UCFS Claimant API database.
